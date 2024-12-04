@@ -2,7 +2,7 @@ name: Release
 permissions:
   contents: write # in order to upload release assets
 on:
-  workflow_dispatch
+  workflow_dispatch:
   release:
     types:
       - published
