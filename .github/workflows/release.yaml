@@ -114,7 +114,12 @@ jobs:
         run: |
           dotnet tool install --global wix
           wix build -arch ${{ matrix.arch }} msi/PomeriumCli.wxs
-          mv PomeriumCli.msi pomerium-cli-windows-${{ matrix.arch }}.msi
+          msifile="pomerium-cli-windows-${{ matrix.arch }}.msi"
+          mv PomeriumCli.msi $msifile
+          hash=$(powershell "(Get-FileHash $msifile -Algorithm SHA256).Hash.ToLower()")
+          echo 'checksums<<EOF' >> $GITHUB_OUTPUT
+          echo "$hash $zipfile" >> $GITHUB_OUTPUT
+          echo EOF >> $GITHUB_OUTPUT
 
       - name: Upload to release
         shell: bash
