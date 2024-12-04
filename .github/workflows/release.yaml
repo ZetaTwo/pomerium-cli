@@ -82,6 +82,11 @@ jobs:
         with:
           go-version: 1.23.x
 
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Build
         id: build
         shell: bash
@@ -101,12 +106,20 @@ jobs:
           echo 'checksums<<EOF' >> $GITHUB_OUTPUT
           echo "$hash $zipfile" >> $GITHUB_OUTPUT
           echo EOF >> $GITHUB_OUTPUT
+      
+      - name: Build MSI
+        id: msi
+        shell: bash
+        run: |
+          dotnet tool install --global wix
+          wix build -arch ${{ matrix.arch }} msi/PomeriumCli.wxs
+          mv PomeriumCli.msi pomerium-cli-windows-${{ matrix.arch }}.msi
 
       - name: Upload to release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" pomerium-cli-windows-*.zip
+        run: gh release upload "${{ github.event.release.tag_name }}" pomerium-cli-windows-*.zip pomerium-cli-windows-*.msi
 
   goreleaser:
     permissions:
