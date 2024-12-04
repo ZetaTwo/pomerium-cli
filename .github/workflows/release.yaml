@@ -71,7 +71,7 @@ jobs:
     needs: metadata
     strategy:
       matrix:
-        arch: [amd64, arm64]
+        arch: [{go: amd64, wix: x64}, {go: arm64, wix: amd64}]
     outputs:
       checksums: ${{ steps.build.outputs.checksums }}
     steps:
@@ -92,8 +92,8 @@ jobs:
         id: build
         shell: bash
         run: |
-          mkdir -p bin/${{ matrix.arch }}
-          GOARCH=${{ matrix.arch }} CGO_ENABLED=1 go build -o bin/${{ matrix.arch }} \
+          mkdir -p bin/${{ matrix.arch.go }}
+          GOARCH=${{ matrix.arch.go }} CGO_ENABLED=1 go build -o bin/${{ matrix.arch.go }} \
             -ldflags="-s -w ${{ needs.metadata.outputs.versionFlags }}" \
             ./cmd/pomerium-cli
 
@@ -101,8 +101,8 @@ jobs:
         id: archive
         shell: bash
         run: |
-          zipfile="pomerium-cli-windows-${{ matrix.arch }}.zip"
-          powershell "Compress-Archive -Path bin\\${{ matrix.arch }}\\\* -DestinationPath $zipfile"
+          zipfile="pomerium-cli-windows-${{ matrix.arch.go }}.zip"
+          powershell "Compress-Archive -Path bin\\${{ matrix.arch.go }}\\\* -DestinationPath $zipfile"
           hash=$(powershell "(Get-FileHash $zipfile -Algorithm SHA256).Hash.ToLower()")
           echo 'checksums<<EOF' >> $GITHUB_OUTPUT
           echo "$hash $zipfile" >> $GITHUB_OUTPUT
@@ -113,8 +113,8 @@ jobs:
         shell: bash
         run: |
           dotnet tool install --global wix
-          wix build -arch ${{ matrix.arch }} -b bin\\${{ matrix.arch }} msi/PomeriumCli.wxs
-          msifile="pomerium-cli-windows-${{ matrix.arch }}.msi"
+          wix build -arch ${{ matrix.arch.wix }} -b bin\\${{ matrix.arch.go }} msi/PomeriumCli.wxs
+          msifile="pomerium-cli-windows-${{ matrix.arch.go }}.msi"
           mv PomeriumCli.msi $msifile
           hash=$(powershell "(Get-FileHash $msifile -Algorithm SHA256).Hash.ToLower()")
           echo 'checksums<<EOF' >> $GITHUB_OUTPUT
