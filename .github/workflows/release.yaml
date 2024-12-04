@@ -113,7 +113,7 @@ jobs:
         shell: bash
         run: |
           dotnet tool install --global wix
-          wix build -arch ${{ matrix.arch }} msi/PomeriumCli.wxs
+          wix build -arch ${{ matrix.arch }} -b bin\\${{ matrix.arch }} msi/PomeriumCli.wxs
           msifile="pomerium-cli-windows-${{ matrix.arch }}.msi"
           mv PomeriumCli.msi $msifile
           hash=$(powershell "(Get-FileHash $msifile -Algorithm SHA256).Hash.ToLower()")

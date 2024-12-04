@@ -13,7 +13,7 @@
         <StandardDirectory Id="ProgramFiles64Folder">
             <Directory Id="INSTALLFOLDER" Name="Pomerium\Pomerium CLI">
                 <Component Id="CliExecutable">
-                    <File Id="PomeriumCliExe" KeyPath="yes" Source="pomerium-cli.exe"></File>
+                    <File Id="PomeriumCliExe" KeyPath="yes" Name="pomerium-cli.exe" Source="pomerium-cli.exe"></File>
                 </Component>
             </Directory>
         </StandardDirectory>
