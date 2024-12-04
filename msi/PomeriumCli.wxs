@@ -1,6 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Package UpgradeCode="0A602749-404A-4192-84F3-9A7BA9F93EA1" Language="1033"
-        Manufacturer="Pomerium" Name="Pomerium CLI" Version="1.0.0.0">
+        Manufacturer="Pomerium" Name="Pomerium CLI" Version="$(var.version)">
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
 

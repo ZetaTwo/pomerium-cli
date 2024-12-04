@@ -27,6 +27,7 @@ jobs:
             "-X github.com/pomerium/cli/version.ProjectURL=https://www.pomerium.io"
           )
           echo "versionFlags=${ldflags[*]}" >> $GITHUB_OUTPUT
+          echo "versionNumber=$(echo ${{ github.event.release.tag_name }} | grep -o -P "\d+(?:\.\d+)*" || echo "1.0.0.0")" >> $GITHUB_OUTPUT
 
   build-macos:
     runs-on: macos-latest
@@ -71,7 +72,7 @@ jobs:
     needs: metadata
     strategy:
       matrix:
-        arch: [{go: amd64, wix: x64}, {go: arm64, wix: amd64}]
+        arch: [{go: amd64, wix: x64}, {go: arm64, wix: arm64}]
     outputs:
       checksums: ${{ steps.build.outputs.checksums }}
     steps:
@@ -113,7 +114,7 @@ jobs:
         shell: bash
         run: |
           dotnet tool install --global wix
-          wix build -arch ${{ matrix.arch.wix }} -b bin\\${{ matrix.arch.go }} msi/PomeriumCli.wxs
+          wix build -arch ${{ matrix.arch.wix }} -b bin\\${{ matrix.arch.go }} "-dversion=${{ needs.metadata.outputs.versionNumber }}" msi/PomeriumCli.wxs
           msifile="pomerium-cli-windows-${{ matrix.arch.go }}.msi"
           mv PomeriumCli.msi $msifile
           hash=$(powershell "(Get-FileHash $msifile -Algorithm SHA256).Hash.ToLower()")
